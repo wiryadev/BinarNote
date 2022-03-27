@@ -14,4 +14,5 @@ import com.wiryadev.binarnote.data.local.entity.UserEntity
 )
 abstract class BinarNoteDatabase : RoomDatabase() {
     abstract fun noteDao(): BinarNoteDao
+    abstract fun userDao(): BinarUserDao
 }

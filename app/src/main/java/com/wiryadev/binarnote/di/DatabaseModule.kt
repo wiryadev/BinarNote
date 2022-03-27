@@ -28,6 +28,10 @@ object DatabaseModule {
 
     @Singleton
     @Provides
-    fun provideDao(database: BinarNoteDatabase) = database.noteDao()
+    fun provideNoteDao(database: BinarNoteDatabase) = database.noteDao()
+
+    @Singleton
+    @Provides
+    fun provideUserDao(database: BinarNoteDatabase) = database.userDao()
 
 }
