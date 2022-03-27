@@ -26,4 +26,8 @@ object DatabaseModule {
         )
         .build()
 
+    @Singleton
+    @Provides
+    fun provideDao(database: BinarNoteDatabase) = database.noteDao()
+
 }
