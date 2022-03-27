@@ -1,7 +1,8 @@
-package com.wiryadev.binarnote
+package com.wiryadev.binarnote.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.wiryadev.binarnote.R
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
