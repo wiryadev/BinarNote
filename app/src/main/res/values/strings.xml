@@ -10,4 +10,9 @@
     <string name="username">Username</string>
     <string name="register">Register</string>
     <string name="confirm_password">Confirm Password</string>
+    <string name="add_new_note">Add New Note</string>
+    <string name="logout">Logout</string>
+    <string name="home">Home</string>
+    <string name="delete_this_note">Delete this note</string>
+    <string name="edit_this_note">Edit this note</string>
 </resources>

@@ -38,7 +38,6 @@
         android:layout_marginStart="24dp"
         android:layout_marginTop="24dp"
         android:text="@string/email"
-        android:textColor="@color/black"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/imageView" />
 
@@ -70,7 +69,6 @@
         android:layout_marginStart="24dp"
         android:layout_marginTop="16dp"
         android:text="@string/password"
-        android:textColor="@color/black"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/til_email" />
 
@@ -104,7 +102,6 @@
         android:layout_marginTop="32dp"
         android:text="@string/login"
         android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-        app:cornerRadius="32dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/til_password" />
