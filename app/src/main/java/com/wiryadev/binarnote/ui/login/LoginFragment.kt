@@ -1,6 +1,7 @@
 package com.wiryadev.binarnote.ui.login
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -28,6 +29,7 @@ class LoginFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.btnRegister.setOnClickListener {
+            Log.d("OnClickRegister", "onViewCreated: executed")
             findNavController().navigate(
                 LoginFragmentDirections.actionLoginFragmentToRegisterFragment()
             )

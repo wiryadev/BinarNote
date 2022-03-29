@@ -1,19 +1,13 @@
 package com.wiryadev.binarnote.ui.register
 
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.wiryadev.binarnote.data.local.entity.UserEntity
 import com.wiryadev.binarnote.data.repositories.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -26,6 +20,9 @@ class RegisterViewModel @Inject constructor(
 
     val queryChannel = MutableStateFlow("")
 
+    private val _uiState: MutableStateFlow<RegisterUiState> = MutableStateFlow(RegisterUiState())
+    val uiState: LiveData<RegisterUiState> get() = _uiState.asLiveData()
+
     val checkUserExist = queryChannel
         .debounce(200)
         .filter {
@@ -34,12 +31,35 @@ class RegisterViewModel @Inject constructor(
         .mapLatest {
             userRepository.checkUserExist(it)
         }
+        .catch {
+            _uiState.value = RegisterUiState(
+                errorMessage = "Something Went Wrong"
+            )
+        }
         .asLiveData(Dispatchers.IO)
 
     fun register(user: UserEntity) {
+        _uiState.update {
+            it.copy(isLoading = true, isButtonClicked = true)
+        }
         viewModelScope.launch {
-            userRepository.register(user = user)
+            try {
+                userRepository.register(user = user)
+                _uiState.update {
+                    it.copy(isLoading = false, errorMessage = null)
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(isLoading = true, errorMessage = e.message)
+                }
+            }
         }
     }
 
 }
+
+data class RegisterUiState(
+    val isLoading: Boolean = false,
+    val errorMessage: String? = null,
+    val isButtonClicked: Boolean = false,
+)
