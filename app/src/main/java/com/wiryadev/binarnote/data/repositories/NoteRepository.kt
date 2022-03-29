@@ -1,22 +1,16 @@
-package com.wiryadev.binarnote.data.local.db
+package com.wiryadev.binarnote.data.repositories
 
-import androidx.room.*
 import com.wiryadev.binarnote.data.local.entity.NoteEntity
 import kotlinx.coroutines.flow.Flow
 
-@Dao
-interface BinarNoteDao {
+interface NoteRepository {
 
-    @Query("SELECT * FROM tableNote WHERE owner=:email")
     fun getAllNotesByEmail(email: String): Flow<List<NoteEntity>>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addNote(note: NoteEntity)
 
-    @Update
     suspend fun updateNote(note: NoteEntity)
 
-    @Delete
     suspend fun deleteNote(note: NoteEntity)
 
 }

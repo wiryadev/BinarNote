@@ -11,9 +11,12 @@ import kotlinx.coroutines.flow.Flow
 interface BinarUserDao {
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun registerUser(user: UserEntity)
+    suspend fun register(user: UserEntity)
+
+    @Query("SELECT EXISTS (SELECT 1 FROM tableUser WHERE email=:email AND password=:password)")
+    fun login(email: String, password: String): Flow<Int>
 
     @Query("SELECT EXISTS (SELECT 1 FROM tableUser WHERE email=:email)")
-    fun checkUserExist(email: String): Flow<Int>
+    fun checkUserExist(email: String): Int
 
 }
