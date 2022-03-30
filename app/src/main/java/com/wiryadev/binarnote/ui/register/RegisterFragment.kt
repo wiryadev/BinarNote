@@ -63,10 +63,7 @@ class RegisterFragment : Fragment() {
 
             binding.btnRegister.isVisible = !uiState.isLoading
 
-            if (!uiState.isLoading
-                && uiState.errorMessage.isNullOrEmpty()
-                && uiState.isButtonClicked
-            ) {
+            if (uiState.isSuccess) {
                 findNavController().navigate(
                     RegisterFragmentDirections.actionRegisterFragmentToRegisterSuccessFragment(
                         email = emailToBeSent

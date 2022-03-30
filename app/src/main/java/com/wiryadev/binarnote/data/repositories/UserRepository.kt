@@ -8,7 +8,7 @@ interface UserRepository {
 
     suspend fun register(user: UserEntity)
 
-    suspend fun login(email: String, password: String):Flow<Int>
+    suspend fun login(email: String, password: String):Flow<UserEntity>
 
     suspend fun checkUserExist(email: String): Int
 

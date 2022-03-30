@@ -13,8 +13,8 @@ interface BinarUserDao {
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun register(user: UserEntity)
 
-    @Query("SELECT EXISTS (SELECT 1 FROM tableUser WHERE email=:email AND password=:password)")
-    fun login(email: String, password: String): Flow<Int>
+    @Query("SELECT * FROM tableUser WHERE email=:email AND password=:password LIMIT 1")
+    fun login(email: String, password: String): Flow<UserEntity>
 
     @Query("SELECT EXISTS (SELECT 1 FROM tableUser WHERE email=:email)")
     fun checkUserExist(email: String): Int

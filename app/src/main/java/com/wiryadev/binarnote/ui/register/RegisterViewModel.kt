@@ -40,17 +40,17 @@ class RegisterViewModel @Inject constructor(
 
     fun register(user: UserEntity) {
         _uiState.update {
-            it.copy(isLoading = true, isButtonClicked = true)
+            it.copy(isLoading = true)
         }
         viewModelScope.launch {
             try {
                 userRepository.register(user = user)
                 _uiState.update {
-                    it.copy(isLoading = false, errorMessage = null)
+                    it.copy(isLoading = false, isSuccess = true)
                 }
             } catch (e: Exception) {
                 _uiState.update {
-                    it.copy(isLoading = true, errorMessage = e.message)
+                    it.copy(isLoading = false, errorMessage = e.message)
                 }
             }
         }
@@ -61,5 +61,5 @@ class RegisterViewModel @Inject constructor(
 data class RegisterUiState(
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
-    val isButtonClicked: Boolean = false,
+    val isSuccess: Boolean = false,
 )

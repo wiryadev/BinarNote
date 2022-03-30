@@ -18,7 +18,7 @@ class UserRepositoryImpl @Inject constructor(
         userDao.register(user = user)
     }
 
-    override suspend fun login(email: String, password: String): Flow<Int> {
+    override suspend fun login(email: String, password: String): Flow<UserEntity> {
         return userDao.login(
             email = email,
             password = password,
