@@ -1,5 +1,6 @@
 package com.wiryadev.binarnote.data.local.entity
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -7,7 +8,13 @@ import androidx.room.PrimaryKey
 data class NoteEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    val title: String,
-    val description: String,
+
+    @ColumnInfo(name = "date")
+    val date: String,
+
+    @ColumnInfo(name = "logbook")
+    val logbook: String,
+
+    @ColumnInfo(name = "owner")
     val owner: String,
 )
