@@ -15,4 +15,7 @@
     <string name="home">Home</string>
     <string name="delete_this_note">Delete this note</string>
     <string name="edit_this_note">Edit this note</string>
+    <string name="registration_done">Registration Done</string>
+    <string name="registration_success">Registration Success</string>
+    <string name="registration_success_subtitle">Now you can login to use our app ~~~</string>
 </resources>

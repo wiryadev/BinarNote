@@ -2,17 +2,14 @@ package com.wiryadev.binarnote.ui.register
 
 import android.os.Bundle
 import android.util.Patterns
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
-import androidx.core.widget.doOnTextChanged
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.wiryadev.binarnote.R
 import com.wiryadev.binarnote.data.local.entity.UserEntity
 import com.wiryadev.binarnote.databinding.FragmentRegisterBinding
 import com.wiryadev.binarnote.ui.addErrorListener
@@ -20,7 +17,6 @@ import com.wiryadev.binarnote.ui.showSnackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.delay
 
 @FlowPreview
 @ExperimentalCoroutinesApi
@@ -31,6 +27,7 @@ class RegisterFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: RegisterViewModel by viewModels()
+    private var emailToBeSent = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -70,11 +67,11 @@ class RegisterFragment : Fragment() {
                 && uiState.errorMessage.isNullOrEmpty()
                 && uiState.isButtonClicked
             ) {
-                lifecycleScope.launchWhenResumed {
-                    binding.root.showSnackbar("Registration Success")
-                    delay(1000)
-                    findNavController().navigateUp()
-                }
+                findNavController().navigate(
+                    RegisterFragmentDirections.actionRegisterFragmentToRegisterSuccessFragment(
+                        email = emailToBeSent
+                    )
+                )
             }
         }
 
@@ -121,6 +118,7 @@ class RegisterFragment : Fragment() {
                     root.showSnackbar("Pastikan konfirmasi password sesuai")
                 }
                 else -> {
+                    emailToBeSent = email
                     viewModel.register(
                         user = UserEntity(
                             email = email,
