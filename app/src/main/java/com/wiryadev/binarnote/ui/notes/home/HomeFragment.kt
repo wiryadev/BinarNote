@@ -95,12 +95,11 @@ class HomeFragment : Fragment() {
                 bottomSheet.tvTitle.text = getString(R.string.add_new_note)
                 bottomSheet.btnInput.text = getString(R.string.create_note)
 
-                action = if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
+                if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
                     collapseBottomSheet()
                     DbAction.READ
                 } else {
-                    expandBottomSheet()
-                    DbAction.CREATE
+                    expandBottomSheet(DbAction.CREATE)
                 }
             }
         }
@@ -126,14 +125,16 @@ class HomeFragment : Fragment() {
         )
     }
 
-    private fun expandBottomSheet() {
+    private fun expandBottomSheet(dbAction: DbAction) {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
         binding.fabAddNote.setImageResource(R.drawable.ic_round_close_24)
+        action = dbAction
     }
 
     private fun collapseBottomSheet() {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
         binding.fabAddNote.setImageResource(R.drawable.ic_round_add_24)
+        action = DbAction.READ
     }
 
     private fun prepareRecyclerView() {
