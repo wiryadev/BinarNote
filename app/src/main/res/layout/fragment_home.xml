@@ -65,13 +65,18 @@
     </ScrollView>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_add_story"
+        android:id="@+id/fab_add_note"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="24dp"
         android:contentDescription="@string/add_new_note"
         android:src="@drawable/ic_round_add_24"
         app:layout_anchor="@id/sv_content"
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
         app:layout_anchorGravity="bottom|end" />
+
+    <include
+        android:id="@+id/bottom_sheet"
+        layout="@layout/note_add_update_dialog" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

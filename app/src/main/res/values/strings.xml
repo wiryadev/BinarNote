@@ -18,4 +18,8 @@
     <string name="registration_done">Registration Done</string>
     <string name="registration_success">Registration Success</string>
     <string name="registration_success_subtitle">Now you can login to use our app ~~~</string>
+    <string name="new_note">New Note</string>
+    <string name="create_note">Create Note</string>
+    <string name="date">Date</string>
+    <string name="logbook">Logbook</string>
 </resources>
