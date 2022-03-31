@@ -5,6 +5,9 @@ import android.widget.EditText
 import androidx.core.widget.addTextChangedListener
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+import java.util.*
 
 fun View.showSnackbar(message: String) {
     Snackbar.make(this, message, Snackbar.LENGTH_LONG).show()
@@ -32,4 +35,11 @@ inline fun EditText.addErrorListener(
             }
         },
     )
+}
+
+val simpleDateFormat = SimpleDateFormat("MM/dd/yyyy", Locale.ROOT)
+
+fun String.formatDisplayDate(): String {
+    val dateFormatToBeDisplayed = simpleDateFormat.parse(this) as Date
+    return DateFormat.getDateInstance(DateFormat.FULL).format(dateFormatToBeDisplayed)
 }
