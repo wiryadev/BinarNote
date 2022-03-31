@@ -9,7 +9,10 @@ import com.wiryadev.binarnote.data.local.entity.NoteEntity
 import com.wiryadev.binarnote.databinding.ItemNoteBinding
 import com.wiryadev.binarnote.ui.formatDisplayDate
 
-class NoteAdapter : RecyclerView.Adapter<NoteAdapter.NoteViewHolder>() {
+class NoteAdapter(
+    private val onEditClickListener: (NoteEntity) -> Unit,
+    private val onDeleteClickListener: (NoteEntity) -> Unit,
+) : RecyclerView.Adapter<NoteAdapter.NoteViewHolder>() {
 
     private val diffCallback = object : DiffUtil.ItemCallback<NoteEntity>() {
         override fun areItemsTheSame(oldItem: NoteEntity, newItem: NoteEntity): Boolean {
@@ -33,6 +36,12 @@ class NoteAdapter : RecyclerView.Adapter<NoteAdapter.NoteViewHolder>() {
             with(binding) {
                 tvTitle.text = note.date.formatDisplayDate()
                 tvDesc.text = note.logbook
+                btnEdit.setOnClickListener {
+                    onEditClickListener.invoke(note)
+                }
+                btnDelete.setOnClickListener {
+                    onDeleteClickListener.invoke(note)
+                }
             }
         }
 

@@ -1,6 +1,7 @@
 package com.wiryadev.binarnote.ui.notes.home
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,7 +23,7 @@ import com.wiryadev.binarnote.ui.formatDisplayDate
 import com.wiryadev.binarnote.ui.showSnackbar
 import com.wiryadev.binarnote.ui.simpleDateFormat
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.Date
+import java.util.*
 
 
 @AndroidEntryPoint
@@ -88,19 +89,18 @@ class HomeFragment : Fragment() {
             viewModel.logout()
         }
 
-        initBottomSheetListener()
-
         with(binding) {
             fabAddNote.setOnClickListener {
                 bottomSheet.tvTitle.text = getString(R.string.add_new_note)
-                bottomSheet.btnInput.text = getString(R.string.create_note)
+                bottomSheet.btnInput.text = getString(R.string.create)
 
                 if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
                     collapseBottomSheet()
-                    DbAction.READ
+                    action = DbAction.READ
                 } else {
                     expandBottomSheet(DbAction.CREATE)
                 }
+                initBottomSheetListener()
             }
         }
     }
@@ -138,7 +138,24 @@ class HomeFragment : Fragment() {
     }
 
     private fun prepareRecyclerView() {
-        noteAdapter = NoteAdapter()
+        noteAdapter = NoteAdapter(
+            onEditClickListener = {
+                expandBottomSheet(DbAction.UPDATE)
+                binding.apply {
+                    bottomSheet.tvTitle.text = getString(R.string.update_note)
+                    bottomSheet.btnInput.text = getString(R.string.update)
+                }
+                initBottomSheetListener(note = it)
+            },
+            onDeleteClickListener = {
+                expandBottomSheet(DbAction.DELETE)
+                binding.apply {
+                    bottomSheet.tvTitle.text = getString(R.string.delete_note)
+                    bottomSheet.btnInput.text = getString(R.string.delete)
+                }
+                initBottomSheetListener(note = it)
+            }
+        )
         val noteLayoutManager = LinearLayoutManager(context)
         binding.rvNotes.apply {
             layoutManager = noteLayoutManager
@@ -146,26 +163,39 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun initBottomSheetListener() {
-        val constraintsBuilder = CalendarConstraints.Builder()
-            .setValidator(DateValidatorPointBackward.now())
-
+    private fun initBottomSheetListener(
+        note: NoteEntity? = null,
+    ) {
         var dateForDatabase = ""
 
         with(binding.bottomSheet) {
-            etDate.setOnClickListener {
-                val datePicker =
-                    MaterialDatePicker.Builder.datePicker()
-                        .setTitleText("Select date")
-                        .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
-                        .setCalendarConstraints(constraintsBuilder.build())
-                        .build()
-                datePicker.addOnPositiveButtonClickListener { selection ->
-                    val date = Date(selection)
-                    dateForDatabase = simpleDateFormat.format(date)
-                    etDate.setText(dateForDatabase.formatDisplayDate())
+            when (action) {
+                DbAction.READ, DbAction.CREATE -> {
+                    Log.d("HomeFragment", "initBottomSheetListener: ")
+                    etDate.text?.clear()
+                    etLogbook.text?.clear()
                 }
-                datePicker.show(childFragmentManager, "date")
+                DbAction.UPDATE, DbAction.DELETE -> {
+                    note?.let {
+                        etDate.setText(it.date.formatDisplayDate())
+                        etLogbook.setText(it.logbook)
+                    }
+                }
+            }
+
+            if (action == DbAction.DELETE) {
+                etDate.isEnabled = false
+            } else {
+                etDate.isEnabled = true
+                etDate.setOnClickListener {
+                    val datePicker = buildDatePicker()
+                    datePicker.addOnPositiveButtonClickListener { selection ->
+                        val date = Date(selection)
+                        dateForDatabase = simpleDateFormat.format(date)
+                        etDate.setText(dateForDatabase.formatDisplayDate())
+                    }
+                    datePicker.show(childFragmentManager, "date")
+                }
             }
 
             btnInput.setOnClickListener {
@@ -203,6 +233,17 @@ class HomeFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun buildDatePicker(): MaterialDatePicker<Long> {
+        val constraintsBuilder = CalendarConstraints.Builder()
+            .setValidator(DateValidatorPointBackward.now())
+
+        return MaterialDatePicker.Builder.datePicker()
+            .setTitleText("Select date")
+            .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+            .setCalendarConstraints(constraintsBuilder.build())
+            .build()
     }
 
 }
