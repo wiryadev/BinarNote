@@ -83,7 +83,9 @@ class HomeFragment : Fragment() {
                     View.GONE
                 }
 
-            noteAdapter.submitData(uiState.notes)
+            if (!uiState.isLoading) {
+                noteAdapter.submitData(uiState.notes)
+            }
 
             if (uiState.result > 0) {
                 when (uiState.action) {
@@ -94,6 +96,7 @@ class HomeFragment : Fragment() {
                     Action.UPDATE -> {
                         binding.root.showSnackbar(getString(R.string.update_note_success))
                         collapseBottomSheet()
+                        noteAdapter.notifyDataSetChanged()
                     }
                     Action.DELETE -> {
                         binding.root.showSnackbar(getString(R.string.delete_note_success))
@@ -178,6 +181,7 @@ class HomeFragment : Fragment() {
         binding.rvNotes.apply {
             layoutManager = noteLayoutManager
             adapter = noteAdapter
+            setHasFixedSize(true)
         }
     }
 

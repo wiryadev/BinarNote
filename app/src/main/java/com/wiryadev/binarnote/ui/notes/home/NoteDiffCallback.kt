@@ -24,7 +24,9 @@ class NoteDiffCallback(
     override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
         val oldItem = oldNotes[oldItemPosition]
         val newItem = newNotes[newItemPosition]
+        Log.d("NoteAdapter", "oldLog: ${oldItem.logbook}")
+        Log.d("NoteAdapter", "newLog: ${newItem.logbook}")
         Log.d("NoteAdapter", "areContentsTheSame: ${oldItem.logbook == newItem.logbook}")
-        return oldItem.hashCode() == newItem.hashCode() && oldItem.logbook == newItem.logbook
+        return oldItem.logbook == newItem.logbook
     }
 }
