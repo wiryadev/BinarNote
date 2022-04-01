@@ -1,8 +1,8 @@
 package com.wiryadev.binarnote.ui.notes.home
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.wiryadev.binarnote.data.local.entity.NoteEntity
@@ -14,20 +14,15 @@ class NoteAdapter(
     private val onDeleteClickListener: (NoteEntity) -> Unit,
 ) : RecyclerView.Adapter<NoteAdapter.NoteViewHolder>() {
 
-    private val diffCallback = object : DiffUtil.ItemCallback<NoteEntity>() {
-        override fun areItemsTheSame(oldItem: NoteEntity, newItem: NoteEntity): Boolean {
-            return oldItem.id == newItem.id
-        }
+    private val notes = mutableListOf<NoteEntity>()
 
-        override fun areContentsTheSame(oldItem: NoteEntity, newItem: NoteEntity): Boolean {
-            return oldItem.logbook == newItem.logbook
-        }
-    }
-
-    private val differ = AsyncListDiffer(this, diffCallback)
-
-    fun submitData(data: List<NoteEntity>) {
-        differ.submitList(data)
+    fun submitData(newNotes: List<NoteEntity>) {
+        Log.d("NoteAdapter", "submitData: $newNotes")
+        val diffCallback = NoteDiffCallback(this.notes, newNotes)
+        val diffResult = DiffUtil.calculateDiff(diffCallback)
+        this.notes.clear()
+        this.notes.addAll(newNotes)
+        diffResult.dispatchUpdatesTo(this)
     }
 
     inner class NoteViewHolder(
@@ -57,10 +52,10 @@ class NoteAdapter(
     }
 
     override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
-        val note = differ.currentList[position]
+        val note = notes[position]
         holder.bind(note)
     }
 
-    override fun getItemCount(): Int = differ.currentList.size
+    override fun getItemCount(): Int = notes.size
 
 }

@@ -11,12 +11,12 @@ interface BinarNoteDao {
     fun getAllNotesByEmail(email: String): Flow<List<NoteEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun addNote(note: NoteEntity)
+    suspend fun addNote(note: NoteEntity): Long
 
     @Update
-    suspend fun updateNote(note: NoteEntity)
+    suspend fun updateNote(note: NoteEntity): Int
 
     @Delete
-    suspend fun deleteNote(note: NoteEntity)
+    suspend fun deleteNote(note: NoteEntity): Int
 
 }

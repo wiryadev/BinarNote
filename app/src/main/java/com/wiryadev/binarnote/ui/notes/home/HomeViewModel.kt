@@ -1,6 +1,7 @@
 package com.wiryadev.binarnote.ui.notes.home
 
 import androidx.lifecycle.*
+import com.wiryadev.binarnote.data.Result
 import com.wiryadev.binarnote.data.local.entity.NoteEntity
 import com.wiryadev.binarnote.data.preference.AuthModel
 import com.wiryadev.binarnote.data.repositories.NoteRepository
@@ -8,6 +9,7 @@ import com.wiryadev.binarnote.data.repositories.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -37,7 +39,7 @@ class HomeViewModel @Inject constructor(
 
     private fun checkUserSession() {
         viewModelScope.launch {
-            userRepository.getUserSession().collectLatest {
+            userRepository.getUserSession().collect {
                 _userSession.value = it
             }
         }
@@ -51,11 +53,10 @@ class HomeViewModel @Inject constructor(
         }
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                noteRepository.getAllNotesByEmail(email).collectLatest { notes ->
+                noteRepository.getAllNotesByEmail(email).collect { notes ->
                     _uiState.update {
                         it.copy(
                             notes = notes,
-                            isSuccess = true,
                             isLoading = false,
                         )
                     }
@@ -74,21 +75,23 @@ class HomeViewModel @Inject constructor(
     fun createNote(note: NoteEntity) {
         _uiState.update {
             it.copy(
-                isLoading = true
+                isLoading = true,
+                result = 0,
+                action = Action.CREATE,
             )
         }
         viewModelScope.launch {
-            try {
-                noteRepository.addNote(note)
-                _uiState.update {
-                    it.copy(
-                        isSuccess = true,
+            val result = noteRepository.addNote(note = note)
+
+            _uiState.update {
+                when (result) {
+                    is Result.Success -> it.copy(
+                        isLoading = false,
+                        result = result.data.toInt(),
                     )
-                }
-            } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(
-                        errorMessage = e.message,
+                    is Result.Error -> it.copy(
+                        isLoading = false,
+                        errorMessage = result.exception.message
                     )
                 }
             }
@@ -98,21 +101,23 @@ class HomeViewModel @Inject constructor(
     fun updateNote(note: NoteEntity) {
         _uiState.update {
             it.copy(
-                isLoading = true
+                isLoading = true,
+                result = 0,
+                action = Action.UPDATE,
             )
         }
         viewModelScope.launch {
-            try {
-                noteRepository.updateNote(note)
-                _uiState.update {
-                    it.copy(
-                        isSuccess = true,
+            val result = noteRepository.updateNote(note = note)
+
+            _uiState.update {
+                when (result) {
+                    is Result.Success -> it.copy(
+                        isLoading = false,
+                        result = result.data,
                     )
-                }
-            } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(
-                        errorMessage = e.message,
+                    is Result.Error -> it.copy(
+                        isLoading = false,
+                        errorMessage = result.exception.message
                     )
                 }
             }
@@ -122,21 +127,23 @@ class HomeViewModel @Inject constructor(
     fun deleteNote(note: NoteEntity) {
         _uiState.update {
             it.copy(
-                isLoading = true
+                isLoading = true,
+                result = 0,
+                action = Action.DELETE,
             )
         }
         viewModelScope.launch {
-            try {
-                noteRepository.deleteNote(note)
-                _uiState.update {
-                    it.copy(
-                        isSuccess = true,
+            val result = noteRepository.deleteNote(note = note)
+
+            _uiState.update {
+                when (result) {
+                    is Result.Success -> it.copy(
+                        isLoading = false,
+                        result = result.data,
                     )
-                }
-            } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(
-                        errorMessage = e.message,
+                    is Result.Error -> it.copy(
+                        isLoading = false,
+                        errorMessage = result.exception.message
                     )
                 }
             }
@@ -147,7 +154,12 @@ class HomeViewModel @Inject constructor(
 
 data class HomeUiState(
     val isLoading: Boolean = false,
-    val isSuccess: Boolean = false,
+    val result: Int = 0,
+    val action: Action = Action.CREATE,
     val notes: List<NoteEntity> = emptyList(),
     val errorMessage: String? = null,
 )
+
+enum class Action {
+    CREATE, UPDATE, DELETE,
+}

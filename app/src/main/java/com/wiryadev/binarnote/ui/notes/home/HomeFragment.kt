@@ -76,12 +76,30 @@ class HomeFragment : Fragment() {
                 progressBar.isVisible = uiState.isLoading
             }
 
-            if (uiState.notes.isNotEmpty()) {
-                noteAdapter.submitData(uiState.notes)
-            }
+            binding.emptyState.root.visibility =
+                if (uiState.notes.isEmpty() && !uiState.isLoading) {
+                    View.VISIBLE
+                } else {
+                    View.GONE
+                }
 
-            if (uiState.isSuccess) {
-                collapseBottomSheet()
+            noteAdapter.submitData(uiState.notes)
+
+            if (uiState.result > 0) {
+                when (uiState.action) {
+                    Action.CREATE -> {
+                        binding.root.showSnackbar(getString(R.string.create_note_success))
+                        collapseBottomSheet()
+                    }
+                    Action.UPDATE -> {
+                        binding.root.showSnackbar(getString(R.string.update_note_success))
+                        collapseBottomSheet()
+                    }
+                    Action.DELETE -> {
+                        binding.root.showSnackbar(getString(R.string.delete_note_success))
+                        collapseBottomSheet()
+                    }
+                }
             }
         }
 
