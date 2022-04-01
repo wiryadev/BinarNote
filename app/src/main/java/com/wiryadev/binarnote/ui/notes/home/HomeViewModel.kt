@@ -95,6 +95,54 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun updateNote(note: NoteEntity) {
+        _uiState.update {
+            it.copy(
+                isLoading = true
+            )
+        }
+        viewModelScope.launch {
+            try {
+                noteRepository.updateNote(note)
+                _uiState.update {
+                    it.copy(
+                        isSuccess = true,
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        errorMessage = e.message,
+                    )
+                }
+            }
+        }
+    }
+
+    fun deleteNote(note: NoteEntity) {
+        _uiState.update {
+            it.copy(
+                isLoading = true
+            )
+        }
+        viewModelScope.launch {
+            try {
+                noteRepository.deleteNote(note)
+                _uiState.update {
+                    it.copy(
+                        isSuccess = true,
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        errorMessage = e.message,
+                    )
+                }
+            }
+        }
+    }
+
 }
 
 data class HomeUiState(

@@ -20,13 +20,15 @@ class NoteAdapter(
         }
 
         override fun areContentsTheSame(oldItem: NoteEntity, newItem: NoteEntity): Boolean {
-            return oldItem.hashCode() == newItem.hashCode()
+            return oldItem.logbook == newItem.logbook
         }
     }
 
     private val differ = AsyncListDiffer(this, diffCallback)
 
-    fun submitData(data: List<NoteEntity>) = differ.submitList(data)
+    fun submitData(data: List<NoteEntity>) {
+        differ.submitList(data)
+    }
 
     inner class NoteViewHolder(
         private val binding: ItemNoteBinding

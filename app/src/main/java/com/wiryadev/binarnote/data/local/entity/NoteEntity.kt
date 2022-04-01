@@ -13,7 +13,7 @@ data class NoteEntity(
     val date: String,
 
     @ColumnInfo(name = "logbook")
-    val logbook: String,
+    var logbook: String,
 
     @ColumnInfo(name = "owner")
     val owner: String,

@@ -80,7 +80,7 @@ class HomeFragment : Fragment() {
                 noteAdapter.submitData(uiState.notes)
             }
 
-            if (uiState.isSuccess and (action == DbAction.CREATE)) {
+            if (uiState.isSuccess) {
                 collapseBottomSheet()
             }
         }
@@ -168,10 +168,10 @@ class HomeFragment : Fragment() {
     ) {
         var dateForDatabase = ""
 
+        Log.d("HomeFragment", "initBottomSheetListener: $action")
         with(binding.bottomSheet) {
             when (action) {
                 DbAction.READ, DbAction.CREATE -> {
-                    Log.d("HomeFragment", "initBottomSheetListener: ")
                     etDate.text?.clear()
                     etLogbook.text?.clear()
                 }
@@ -201,7 +201,7 @@ class HomeFragment : Fragment() {
             btnInput.setOnClickListener {
                 val logbook = etLogbook.text.toString().trim()
                 when {
-                    dateForDatabase.trim().isBlank() -> {
+                    etDate.text.toString().trim().isBlank() -> {
                         this.root.showSnackbar("Date must be filled")
                     }
                     logbook.isBlank() -> {
@@ -211,19 +211,25 @@ class HomeFragment : Fragment() {
                         when (action) {
                             DbAction.CREATE -> {
                                 // add note
-                                viewModel.createNote(
-                                    note = NoteEntity(
-                                        date = dateForDatabase,
-                                        logbook = logbook,
-                                        owner = email,
-                                    )
+                                val newNote = NoteEntity(
+                                    date = dateForDatabase,
+                                    logbook = logbook,
+                                    owner = email,
                                 )
+                                viewModel.createNote(note = newNote)
                             }
                             DbAction.UPDATE -> {
-                                // update
+                                // update note
+                                note?.let {
+                                    it.logbook = logbook
+                                    viewModel.updateNote(note = it)
+                                }
                             }
                             DbAction.DELETE -> {
                                 // delete
+                                note?.let {
+                                    viewModel.deleteNote(note = it)
+                                }
                             }
                             else -> {
                                 // nothing
