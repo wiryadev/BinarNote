@@ -1,7 +1,6 @@
 package com.wiryadev.binarnote.ui.notes.home
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -38,7 +37,6 @@ class HomeFragment : Fragment() {
     private lateinit var noteAdapter: NoteAdapter
 
     private var email = ""
-    private var action = DbAction.READ
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -117,11 +115,10 @@ class HomeFragment : Fragment() {
 
                 if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
                     collapseBottomSheet()
-                    action = DbAction.READ
                 } else {
-                    expandBottomSheet(DbAction.CREATE)
+                    expandBottomSheet()
                 }
-                initBottomSheetListener()
+                handleCreateBottomSheet()
             }
         }
     }
@@ -146,35 +143,25 @@ class HomeFragment : Fragment() {
         )
     }
 
-    private fun expandBottomSheet(dbAction: DbAction) {
+    private fun expandBottomSheet() {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
         binding.fabAddNote.setImageResource(R.drawable.ic_round_close_24)
-        action = dbAction
     }
 
     private fun collapseBottomSheet() {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
         binding.fabAddNote.setImageResource(R.drawable.ic_round_add_24)
-        action = DbAction.READ
     }
 
     private fun prepareRecyclerView() {
         noteAdapter = NoteAdapter(
             onEditClickListener = {
-                expandBottomSheet(DbAction.UPDATE)
-                binding.apply {
-                    bottomSheet.tvTitle.text = getString(R.string.update_note)
-                    bottomSheet.btnInput.text = getString(R.string.update)
-                }
-                initBottomSheetListener(note = it)
+                expandBottomSheet()
+                handleUpdateBottomSheet(note = it)
             },
             onDeleteClickListener = {
-                expandBottomSheet(DbAction.DELETE)
-                binding.apply {
-                    bottomSheet.tvTitle.text = getString(R.string.delete_note)
-                    bottomSheet.btnInput.text = getString(R.string.delete)
-                }
-                initBottomSheetListener(note = it)
+                expandBottomSheet()
+                handleDeleteBottomSheet(note = it)
             }
         )
         val noteLayoutManager = LinearLayoutManager(context)
@@ -185,40 +172,57 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun initBottomSheetListener(
-        note: NoteEntity? = null,
-    ) {
+    private fun handleCreateBottomSheet() {
         var dateForDatabase = ""
-
-        Log.d("HomeFragment", "initBottomSheetListener: $action")
         with(binding.bottomSheet) {
-            when (action) {
-                DbAction.READ, DbAction.CREATE -> {
-                    etDate.text?.clear()
-                    etLogbook.text?.clear()
+            etDate.text?.clear()
+            etLogbook.text?.clear()
+
+            etDate.isEnabled = true
+            etLogbook.isEnabled = true
+
+            etDate.setOnClickListener {
+                val datePicker = buildDatePicker()
+                datePicker.addOnPositiveButtonClickListener { selection ->
+                    val date = Date(selection)
+                    dateForDatabase = simpleDateFormat.format(date)
+                    etDate.setText(dateForDatabase.formatDisplayDate())
                 }
-                DbAction.UPDATE, DbAction.DELETE -> {
-                    note?.let {
-                        etDate.setText(it.date.formatDisplayDate())
-                        etLogbook.setText(it.logbook)
-                    }
-                }
+                datePicker.show(childFragmentManager, "date")
             }
 
-            if (action == DbAction.DELETE) {
-                etDate.isEnabled = false
-            } else {
-                etDate.isEnabled = true
-                etDate.setOnClickListener {
-                    val datePicker = buildDatePicker()
-                    datePicker.addOnPositiveButtonClickListener { selection ->
-                        val date = Date(selection)
-                        dateForDatabase = simpleDateFormat.format(date)
-                        etDate.setText(dateForDatabase.formatDisplayDate())
+            btnInput.setOnClickListener {
+                val logbook = etLogbook.text.toString().trim()
+                when {
+                    dateForDatabase.trim().isBlank() -> {
+                        this.root.showSnackbar("Date must be filled")
                     }
-                    datePicker.show(childFragmentManager, "date")
+                    logbook.isBlank() -> {
+                        this.root.showSnackbar("Logbook must be filled")
+                    }
+                    else -> {
+                        val newNote = NoteEntity(
+                            date = dateForDatabase,
+                            logbook = logbook,
+                            owner = email,
+                        )
+                        viewModel.createNote(note = newNote)
+                    }
                 }
             }
+        }
+    }
+
+    private fun handleUpdateBottomSheet(note: NoteEntity) {
+        with(binding.bottomSheet) {
+            etDate.isEnabled = false
+            etLogbook.isEnabled = true
+
+            tvTitle.text = getString(R.string.update_note)
+            btnInput.text = getString(R.string.update)
+
+            etDate.setText(note.date.formatDisplayDate())
+            etLogbook.setText(note.logbook)
 
             btnInput.setOnClickListener {
                 val logbook = etLogbook.text.toString().trim()
@@ -230,35 +234,27 @@ class HomeFragment : Fragment() {
                         this.root.showSnackbar("Logbook must be filled")
                     }
                     else -> {
-                        when (action) {
-                            DbAction.CREATE -> {
-                                // add note
-                                val newNote = NoteEntity(
-                                    date = dateForDatabase,
-                                    logbook = logbook,
-                                    owner = email,
-                                )
-                                viewModel.createNote(note = newNote)
-                            }
-                            DbAction.UPDATE -> {
-                                // update note
-                                note?.let {
-                                    it.logbook = logbook
-                                    viewModel.updateNote(note = it)
-                                }
-                            }
-                            DbAction.DELETE -> {
-                                // delete
-                                note?.let {
-                                    viewModel.deleteNote(note = it)
-                                }
-                            }
-                            else -> {
-                                // nothing
-                            }
-                        }
+                        note.logbook = logbook
+                        viewModel.updateNote(note)
                     }
                 }
+            }
+        }
+    }
+
+    private fun handleDeleteBottomSheet(note: NoteEntity) {
+        with(binding.bottomSheet) {
+            etDate.isEnabled = false
+            etLogbook.isEnabled = false
+
+            tvTitle.text = getString(R.string.delete_note)
+            btnInput.text = getString(R.string.delete)
+
+            etDate.setText(note.date.formatDisplayDate())
+            etLogbook.setText(note.logbook)
+
+            btnInput.setOnClickListener {
+                viewModel.deleteNote(note)
             }
         }
     }
@@ -274,8 +270,4 @@ class HomeFragment : Fragment() {
             .build()
     }
 
-}
-
-enum class DbAction {
-    CREATE, READ, UPDATE, DELETE,
 }
