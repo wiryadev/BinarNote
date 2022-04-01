@@ -45,7 +45,7 @@ class LoginFragment : Fragment() {
 
             binding.btnLogin.isVisible = !uiState.isLoading
 
-            if (uiState.isSuccess || uiState.isLoggedIn) {
+            if (uiState.isLoggedIn) {
                 if (findNavController().currentDestination?.id == R.id.loginFragment) {
                     findNavController().navigate(
                         LoginFragmentDirections.actionLoginFragmentToHomeFragment()

@@ -31,7 +31,10 @@ class LoginViewModel @Inject constructor(
             userRepository.getUserSession().collectLatest { user ->
                 if (user.email.isNotBlank()) {
                     _uiState.update {
-                        it.copy(isLoggedIn = true)
+                        it.copy(
+                            isLoggedIn = true,
+                            errorMessage = null,
+                        )
                     }
                 }
             }
@@ -62,7 +65,6 @@ class LoginViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            isSuccess = true,
                         )
                     }
                 }
@@ -81,7 +83,6 @@ class LoginViewModel @Inject constructor(
 
 data class LoginUiState(
     val isLoggedIn: Boolean = false,
-    val isSuccess: Boolean = false,
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
 )
