@@ -72,7 +72,7 @@ class LoginViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        errorMessage = e.message,
+                        errorMessage = "User Not Found",
                     )
                 }
             }

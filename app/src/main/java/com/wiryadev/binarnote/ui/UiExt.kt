@@ -1,5 +1,6 @@
 package com.wiryadev.binarnote.ui
 
+import android.animation.ObjectAnimator
 import android.view.View
 import android.widget.EditText
 import androidx.core.widget.addTextChangedListener
@@ -12,6 +13,12 @@ import java.util.*
 fun View.showSnackbar(message: String) {
     Snackbar.make(this, message, Snackbar.LENGTH_LONG).show()
 }
+
+fun View.animateAlphaToVisible(
+    animDuration: Long? = null
+): ObjectAnimator = ObjectAnimator
+    .ofFloat(this, View.ALPHA, 1f)
+    .setDuration(animDuration ?: 150L)
 
 inline fun EditText.addErrorListener(
     name: String,

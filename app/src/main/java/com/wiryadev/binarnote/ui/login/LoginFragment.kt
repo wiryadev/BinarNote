@@ -1,5 +1,6 @@
 package com.wiryadev.binarnote.ui.login
 
+import android.animation.AnimatorSet
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +12,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.wiryadev.binarnote.R
 import com.wiryadev.binarnote.databinding.FragmentLoginBinding
+import com.wiryadev.binarnote.ui.animateAlphaToVisible
 import com.wiryadev.binarnote.ui.showSnackbar
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -34,6 +36,8 @@ class LoginFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setupView()
+
         args.email?.let {
             binding.etEmail.setText(it)
         }
@@ -51,6 +55,8 @@ class LoginFragment : Fragment() {
                         LoginFragmentDirections.actionLoginFragmentToHomeFragment()
                     )
                 }
+            } else {
+                animateVisibility()
             }
         }
 
@@ -68,6 +74,36 @@ class LoginFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun setupView() {
+        with(binding) {
+            imageView.alpha = 0f
+            tilEmail.alpha = 0f
+            tvEmail.alpha = 0f
+            tvPassword.alpha = 0f
+            tilPassword.alpha = 0f
+            btnLogin.alpha = 0f
+            btnRegister.alpha = 0f
+        }
+    }
+
+    private fun animateVisibility() {
+        with(binding) {
+            AnimatorSet().apply {
+                playSequentially(
+                    textView.animateAlphaToVisible(),
+                    imageView.animateAlphaToVisible(),
+                    tilEmail.animateAlphaToVisible(),
+                    tvEmail.animateAlphaToVisible(),
+                    tvPassword.animateAlphaToVisible(),
+                    tilPassword.animateAlphaToVisible(),
+                    btnLogin.animateAlphaToVisible(),
+                    btnRegister.animateAlphaToVisible(),
+                )
+                startDelay = 500L
+            }.start()
+        }
     }
 
     private fun checkInputAndRegister() {
