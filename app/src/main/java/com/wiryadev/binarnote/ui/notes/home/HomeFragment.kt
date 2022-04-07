@@ -81,7 +81,7 @@ class HomeFragment : Fragment() {
                     View.GONE
                 }
 
-            if (uiState.notes.isNotEmpty()) {
+            if (!uiState.isLoading) {
                 noteAdapter.submitList(uiState.notes.toList())
             }
 
