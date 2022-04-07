@@ -1,9 +1,9 @@
 package com.wiryadev.binarnote.ui.notes.home
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.wiryadev.binarnote.data.local.entity.NoteEntity
 import com.wiryadev.binarnote.databinding.ItemNoteBinding
@@ -12,18 +12,7 @@ import com.wiryadev.binarnote.ui.formatDisplayDate
 class NoteAdapter(
     private val onEditClickListener: (NoteEntity) -> Unit,
     private val onDeleteClickListener: (NoteEntity) -> Unit,
-) : RecyclerView.Adapter<NoteAdapter.NoteViewHolder>() {
-
-    private val notes = mutableListOf<NoteEntity>()
-
-    fun submitData(newNotes: List<NoteEntity>) {
-        Log.d("NoteAdapter", "submitData: $newNotes")
-        val diffCallback = NoteDiffCallback(this.notes, newNotes)
-        val diffResult = DiffUtil.calculateDiff(diffCallback)
-        this.notes.clear()
-        this.notes.addAll(newNotes)
-        diffResult.dispatchUpdatesTo(this)
-    }
+) : ListAdapter<NoteEntity, NoteAdapter.NoteViewHolder>(NOTE_COMPARATOR) {
 
     inner class NoteViewHolder(
         private val binding: ItemNoteBinding
@@ -52,10 +41,26 @@ class NoteAdapter(
     }
 
     override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
-        val note = notes[position]
+        val note = getItem(position)
         holder.bind(note)
     }
 
-    override fun getItemCount(): Int = notes.size
+    companion object {
+        private val NOTE_COMPARATOR = object : DiffUtil.ItemCallback<NoteEntity>() {
+            override fun areItemsTheSame(
+                oldItem: NoteEntity,
+                newItem: NoteEntity,
+            ): Boolean {
+                return oldItem.id == newItem.id
+            }
+
+            override fun areContentsTheSame(
+                oldItem: NoteEntity,
+                newItem: NoteEntity
+            ): Boolean {
+                return oldItem.logbook == newItem.logbook
+            }
+        }
+    }
 
 }

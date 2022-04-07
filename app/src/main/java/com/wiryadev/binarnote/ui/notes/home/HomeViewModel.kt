@@ -9,7 +9,6 @@ import com.wiryadev.binarnote.data.repositories.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -53,7 +52,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 noteRepository.getAllNotesByEmail(email)
-                    .collectLatest { notes ->
+                    .collect { notes ->
                         _uiState.update {
                             it.copy(
                                 notes = notes,

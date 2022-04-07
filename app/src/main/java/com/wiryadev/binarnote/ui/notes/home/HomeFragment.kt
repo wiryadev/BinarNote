@@ -81,8 +81,8 @@ class HomeFragment : Fragment() {
                     View.GONE
                 }
 
-            if (!uiState.isLoading) {
-                noteAdapter.submitData(uiState.notes)
+            if (uiState.notes.isNotEmpty()) {
+                noteAdapter.submitList(uiState.notes.toList())
             }
 
             if (uiState.result > 0) {
@@ -168,7 +168,6 @@ class HomeFragment : Fragment() {
         binding.rvNotes.apply {
             layoutManager = noteLayoutManager
             adapter = noteAdapter
-            setHasFixedSize(true)
         }
     }
 
